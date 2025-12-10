@@ -1,0 +1,103 @@
+esphome:
+  name: peshosomfy
+  friendly_name: ESP32 Somfy Remote Control
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: DEBUG
+
+external_components:
+  - source:
+      type: local
+      path: custom_components
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+# WiFi configuration
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+  ap:
+    ssid: "PESHORULES"
+    ap_timeout: 90s
+
+captive_portal:
+
+ota:
+  - platform: esphome
+
+# Pesho Somfy component
+pesho_somfy:
+  id: somfy_remote
+  select_cover_pin: GPIO1
+  up_pin: GPIO4
+  down_pin: GPIO2
+  my_pin: GPIO3
+  led3_pin: GPIO6
+  led4_pin: GPIO7
+  led3_binary_sensor: esphome_LED3_State
+  led4_binary_sensor: esphome_LED4_State
+  button_press_duration: 200ms
+
+
+# Button entities for controlling the remote
+button:
+  - platform: template
+    name: "Somfy Select Cover"
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->press_select_cover();
+
+  - platform: template
+    name: "Somfy Up"
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->press_up();
+
+  - platform: template
+    name: "Somfy Down"
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->press_down();
+
+  - platform: template
+    name: "Somfy My"
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->press_my();
+
+  # - platform: template
+  #   name: "Somfy Calibrate Cover"
+  #   on_press:
+  #     - lambda: |-
+  #         id(somfy_remote)->calibrate_cover();
+
+# Binary sensor entities for LED status
+binary_sensor:
+
+  - platform: template
+    name: "Somfy LED3"
+    id: esphome_LED3_State
+    lambda: |-
+      return id(somfy_remote)->get_led3_state();
+    filters:
+      - delayed_on: 100ms      # Wait 100ms before reporting ON
+      - delayed_off: 100ms     # Wait 100ms before reporting OFF
+
+  - platform: template
+    name: "Somfy LED4"
+    id: esphome_LED4_State
+    lambda: |-
+      return id(somfy_remote)->get_led4_state();
+    filters:
+      - delayed_on: 100ms      # Wait 100ms before reporting ON
+      - delayed_off: 100ms      # Wait 100ms before reporting OFF
