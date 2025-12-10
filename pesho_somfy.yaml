@@ -1,3 +1,5 @@
+# This is the configuration file for the ESPHome project. It is used to compile the project and upload it to the ESP32C3 Supermini.
+
 esphome:
   name: peshosomfy
   friendly_name: ESP32 Somfy Remote Control
@@ -9,22 +11,27 @@ esp32:
 
 # Enable logging
 logger:
-  level: DEBUG
+  level: INFO  # Changed from DEBUG to reduce verbose component logging
 
 external_components:
   - source:
-      type: local
-      path: custom_components
+      type: git
+      url: https://github.com/AmsterdamTimmah/peshosomfy.git
+      ref: main  # Change to 'master' if your default branch is master
+    components: [pesho_somfy]
 
 # Enable Home Assistant API
 api:
   encryption:
-    key: !secret api_encryption_key
+    key: !secret pesho_api_encryption_key
 
 # WiFi configuration
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_password
+    - ssid: !secret wifi_pesho_ssid
+      password: !secret wifi_pesho_password
   fast_connect: true
   ap:
     ssid: "PESHORULES"
@@ -46,6 +53,7 @@ pesho_somfy:
   led4_pin: GPIO7
   led3_binary_sensor: esphome_LED3_State
   led4_binary_sensor: esphome_LED4_State
+  ready_binary_sensor: somfy_ready
   button_press_duration: 200ms
 
 
@@ -79,7 +87,124 @@ button:
   #   name: "Somfy Calibrate Cover"
   #   on_press:
   #     - lambda: |-
-  #         id(somfy_remote)->calibrate_cover();
+  #         id(somfy_remote)->calibrate_cover_index();
+
+  - platform: template
+    name: "Somfy Reset->3"
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->select_cover(2);  // Select Cover 3 (index 2)
+
+  # Cover control buttons (for Home Assistant cover templates)
+  # Cover 1 (Index 0)
+  - platform: template
+    name: "Somfy Cover 1 Up"
+    id: cover1up
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_open(0);
+
+  - platform: template
+    name: "Somfy Cover 1 Down"
+    id: cover1down
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_close(0);
+
+  - platform: template
+    name: "Somfy Cover 1 Stop"
+    id: cover1stop
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_stop(0);
+
+  # Cover 2 (Index 1)
+  - platform: template
+    name: "Somfy Cover 2 Up"
+    id: cover2up
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_open(1);
+
+  - platform: template
+    name: "Somfy Cover 2 Down"
+    id: cover2down
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_close(1);
+
+  - platform: template
+    name: "Somfy Cover 2 Stop"
+    id: cover2stop
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_stop(1);
+
+  # Cover 3 (Index 2)
+  - platform: template
+    name: "Somfy Cover 3 Up"
+    id: cover3up
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_open(2);
+
+  - platform: template
+    name: "Somfy Cover 3 Down"
+    id: cover3down
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_close(2);
+
+  - platform: template
+    name: "Somfy Cover 3 Stop"
+    id: cover3stop
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_stop(2);
+
+  # Cover 4 (Index 3)
+  - platform: template
+    name: "Somfy Cover 4 Up"
+    id: cover4up
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_open(3);
+
+  - platform: template
+    name: "Somfy Cover 4 Down"
+    id: cover4down
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_close(3);
+
+  - platform: template
+    name: "Somfy Cover 4 Stop"
+    id: cover4stop
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_stop(3);
+
+  # Cover 5 (Index 4)
+  - platform: template
+    name: "Somfy Cover 5 Up"
+    id: cover5up
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_open(4);
+
+  - platform: template
+    name: "Somfy Cover 5 Down"
+    id: cover5down
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_close(4);
+
+  - platform: template
+    name: "Somfy Cover 5 Stop"
+    id: cover5stop
+    on_press:
+      - lambda: |-
+          id(somfy_remote)->cover_stop(4);
 
 # Binary sensor entities for LED status
 binary_sensor:
@@ -101,3 +226,26 @@ binary_sensor:
     filters:
       - delayed_on: 100ms      # Wait 100ms before reporting ON
       - delayed_off: 100ms      # Wait 100ms before reporting OFF
+
+  - platform: template
+    name: "Somfy Ready"
+    id: somfy_ready
+    # State is published directly by the component, no lambda needed
+
+# Number entity for selecting cover (1-5, corresponds to Remote Covers 1-5)
+number:
+  - platform: template
+    name: "Somfy Select Cover"
+    id: somfy_cover_selection
+    min_value: 1
+    max_value: 5
+    step: 1
+    lambda: |-
+      // Return current cover as Remote Cover number (1-5)
+      return (float)(id(somfy_remote)->get_current_cover_index() + 1);
+    set_action:
+      - lambda: |-
+          // Convert from Remote Cover (1-5) to Index (0-4)
+          uint8_t target_index = (uint8_t)(x - 1);
+          id(somfy_remote)->select_cover(target_index);
+    update_interval: 500ms

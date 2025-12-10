@@ -1,0 +1,87 @@
+
+## PESHO COVERS:
+- cover:
+  - unique_id: somfy_cover_1
+    name: "Somfy Cover 1"
+    device_class: blind
+    optimistic: true
+    open_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_1_up
+    close_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_1_down
+    stop_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_1_stop
+
+  - unique_id: somfy_cover_2
+    name: "Somfy Cover 2"
+    device_class: blind
+    optimistic: true
+    open_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_2_up
+    close_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_2_down
+    stop_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_2_stop
+
+  - unique_id: somfy_cover_3
+    name: "Somfy Cover 3"
+    device_class: blind
+    optimistic: true
+    open_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_3_up
+    close_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_3_down
+    stop_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_3_stop
+
+  - unique_id: somfy_cover_4
+    name: "Somfy Cover 4"
+    device_class: blind
+    optimistic: true
+    open_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_4_up
+    close_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_4_down
+    stop_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_4_stop
+
+  - unique_id: somfy_cover_5
+    name: "Somfy Cover 5"
+    device_class: blind
+    optimistic: true
+    open_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_5_up
+    close_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_5_down
+    stop_cover:
+      - service: button.press
+        target:
+          entity_id: button.esp32_somfy_remote_control_somfy_cover_5_stop
